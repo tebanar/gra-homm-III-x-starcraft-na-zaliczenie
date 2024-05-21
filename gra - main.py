@@ -17,6 +17,7 @@ class Plains(Tiles):
     def __init__(self, x, y,id):
         self.jaki_biom = "Plains"
         self.mozna_budowac = False
+        self.interakcja = False
         self.mozna_chodzic = True
         self.mozna_przeszukac = True
         self.rzadkosc_przeszukania = "common"
@@ -31,6 +32,7 @@ class Mountains(Tiles):
     def __init__(self, x, y,id):
         self.jaki_biom = "Mountains"
         self.mozna_budowac = True
+        self.interakcja = False
         self.mozna_przeszukac = True
         self.rzadkosc_przeszukania = "rare"
         self.mozna_chodzic = False
@@ -45,6 +47,7 @@ class Bridge(Tiles):
     def __init__(self, x, y,id):
         self.jaki_biom = "Bridge"
         self.mozna_budowac = True
+        self.interakcja = False
         self.mozna_chodzic = True
         self.mozna_przeszukac = False
         self.trudny_teren = False
@@ -56,8 +59,9 @@ class Bridge(Tiles):
 class KopalniaZlota(Tiles):
     def __init__(self, x, y,id):
         self.jaki_biom = "Kopalnia_zlota"
-        self.mozna_budowac = True
-        self.mozna_chodzic = True
+        self.mozna_budowac = False
+        self.mozna_chodzic = False
+        self.interakcja = False
         self.mozna_przeszukac = False
         self.trudny_teren = False
         super().__init__(x, y,id)
@@ -65,11 +69,25 @@ class KopalniaZlota(Tiles):
             print("\033[1;35;40m Z ",end="")
     def zmianalinijkimapy(self):
             print(" Z ")
+class Miasto(Tiles):
+    def __init__(self, x, y,id):
+        self.jaki_biom = "Miasto"
+        self.mozna_budowac = False
+        self.mozna_chodzic = False
+        self.interakcja = True
+        self.mozna_przeszukac = False
+        self.trudny_teren = False
+        super().__init__(x, y,id)
+    def drukmapy(self):
+            print("\033[1;34;40m M ",end="")
+    def zmianalinijkimapy(self):
+            print(" M ")
 class KopalniaKamienia(Tiles):
     def __init__(self, x, y,id):
         self.jaki_biom = "Kopalnia_kamienia"
         self.mozna_budowac = False
         self.mozna_chodzic = False
+        self.interakcja = False
         self.mozna_przeszukac = False
         self.trudny_teren = False
         super().__init__(x, y,id)
@@ -82,6 +100,7 @@ class Lumberjack(Tiles):
         self.jaki_biom = "Drwal"
         self.mozna_budowac = False
         self.mozna_chodzic = False
+        self.interakcja = False
         self.mozna_przeszukac = False
         self.trudny_teren = False
         super().__init__(x, y,id)
@@ -93,6 +112,7 @@ class Forest(Tiles):
     def __init__(self, x, y,id):
         self.jaki_biom = "Forest"
         self.mozna_budowac = True
+        self.interakcja = False
         self.mozna_przeszukac = True
         self.mozna_chodzic = True
         self.rzadkosc_przeszukania = "epic"
@@ -113,30 +133,6 @@ class Jednostka(Tiles):
           self.koordynat_x = x
      def replacey(self,y):
           self.koordynat_y = y
-
-# =============================================================================
-for i in range(2499):
-    a = 0
-    
-    if x < 50:
-        a = randint(1,1000)
-        if a >= 1 and a <=10:
-             tile = Mountains(x,y,i)
-        elif a >= 11 and a <=20:
-             tile = Forest(x,y,i)
-
-        else:
-            tile = Plains(x,y,i)
-
-        mapa.append(tile)
-        x+=1
-    elif x >= 50:
-        x -= 50
-        y += 1
-
-        tile = Plains(x,y,i)
- 
-        mapa.append(tile)
 
 # =============================================================================
 def generacja_gor(tile:object,mapa:list,n):
@@ -167,36 +163,15 @@ def gen_postaci(mapa,n, lista_postaci):
     
     q = 0
     while q == 0:
-        x = randint(2,49)
-        y = randint(2,49)
+
         for i in mapa:
-            if x == i.koordynat_x and y == i.koordynat_y and i.jaki_biom == "Plains":
+            if i.jaki_biom == "Miasto":
                 q+=1
                 n+=1
-                obj = Jednostka(x,y,n)
+                obj = Jednostka(i.koordynat_x,i.koordynat_y,n)
                 lista_postaci.append(obj)
                 return lista_postaci
             else:continue
-         
-
-for i in range(20):
-
-     n = 0
-     for obj in mapa:
-
-
-        mapa[n] = generacja_gor(obj,mapa,n)
-
-        n+=1
-for i in range(17):
-     n=0
-     for obj in mapa:
-          mapa[n] = generacja_lasu(obj,mapa,n)
-          n+=1
-
-gen_postaci(mapa,n,lista_postaci)
-gen_postaci(mapa,n,lista_postaci)
-gen_postaci(mapa,n,lista_postaci)
 def generowanie_postaci_na_mapie(lista_postaci,obj):
 
     for i in lista_postaci:
@@ -220,10 +195,74 @@ def generacjamapy(mapa,lista_postaci):
         elif obj.koordynat_y != n:
                 obj.zmianalinijkimapy()
                 n += 1
+# =============================================================================         
+for i in range(2499):
+    a = 0
+    if i == 2250:
+        tile = Miasto(x,y,i)
+        x+=1
+        mapa.append(tile)
+    
+    elif x < 50:
+        a = randint(1,1000)
+        if a >= 1 and a <=10:
+             tile = Mountains(x,y,i)
+        elif a >= 11 and a <=20:
+             tile = Forest(x,y,i)
+
+        else:
+            tile = Plains(x,y,i)
+
+        mapa.append(tile)
+        x+=1
+    elif x >= 50:
+        x -= 50
+        y += 1
+
+        tile = Plains(x,y,i)
+ 
+        mapa.append(tile)
 
 
-generacjamapy(mapa,lista_postaci)
 
+
+for i in range(20):
+
+     n = 0
+     for obj in mapa:
+
+
+        mapa[n] = generacja_gor(obj,mapa,n)
+
+        n+=1
+for i in range(17):
+     n=0
+     for obj in mapa:
+          mapa[n] = generacja_lasu(obj,mapa,n)
+          n+=1
+
+
+
+
+# ================================================================================
+# ================================================================================
+def miasto(mapa,n,lista_postaci):
+     print("jestes w miescie")
+     abc = input("jesli chcesz nowa postac napisz nowa postac - " )
+     if abc == "nowa postac":
+          gen_postaci(mapa,n,lista_postaci)
+
+
+
+
+
+def interakcja(koordynat_x,koordynat_y,mapa,n,lista_postaci):
+     for obj in mapa:
+          if koordynat_x == obj.koordynat_x and koordynat_y == obj.koordynat_y and obj.interakcja == True:
+               if obj.jaki_biom == "Miasto":
+                    miasto(mapa,n,lista_postaci)
+# # ================================================================================
+# ================================================================================
 def jakabudowla(koordynat_x,koordynat_y,id,mapa):
 
      while True:
@@ -248,7 +287,8 @@ def jakabudowla(koordynat_x,koordynat_y,id,mapa):
             elif wybor == "d" and koordynat_x == obj.koordynat_x and koordynat_y == obj.koordynat_y and obj.jaki_biom == "Forest":
                     return Lumberjack(koordynat_x,koordynat_y,id)
 
-
+# ================================================================================
+# ================================================================================
 def system_ruchu(day_counter,postac,lista_postaci,mapa,addmove):
      day_counter+=1
      o = 0
@@ -287,6 +327,10 @@ def system_ruchu(day_counter,postac,lista_postaci,mapa,addmove):
                             if obj.koordynat_x == postac.koordynat_x and obj.koordynat_y == postac.koordynat_y+1 and obj.mozna_chodzic == True:
                                 postac.replacey(postac.koordynat_y+1)
                                 i = False
+                                if obj.trudny_teren == True:
+                                     movementpoints-=2
+                                else:
+                                     movementpoints-=1  
                                 break
                 if wsad == "w":
                         for obj in mapa:
@@ -332,57 +376,76 @@ def system_ruchu(day_counter,postac,lista_postaci,mapa,addmove):
                                 o +=1
                                 movementpoints-=1  
                                 break
-                # if wsad == "ap":
-                #         for obj in mapa:
-                #             if obj.koordynat_x == postac.koordynat_x-1 and obj.koordynat_y == postac.koordynat_y and obj.mozna_budowac == True:
-                #                 mapa[obj.id] = Bridge(obj.koordynat_x,obj.koordynat_y,obj.id)
-                #                 o +=1
-                #                 i = False
-                #                 movementpoints-=1  
-                #                 break
-                # if wsad == "dp":
-                #         for obj in mapa:
-                #             if obj.koordynat_x == postac.koordynat_x+1 and obj.koordynat_y == postac.koordynat_y and obj.mozna_budowac == True:
-                #                 mapa[obj.id] = Bridge(obj.koordynat_x,obj.koordynat_y,obj.id)
-                #                 i = False
-                #                 o +=1
-                #                 movementpoints-=1  
-                #                 break  
-                # if wsad == "sp":
-                #         for obj in mapa:
-                #             if obj.koordynat_x == postac.koordynat_x and obj.koordynat_y == postac.koordynat_y+1 and obj.mozna_budowac == True:
-                #                 mapa[obj.id] = Bridge(obj.koordynat_x,obj.koordynat_y,obj.id)
-                #                 i = False
-                #                 o +=1
-                #                 movementpoints-=1  
-                #                 break
-                # if wsad == "wp":
-                #         for obj in mapa:
-                #             if obj.koordynat_x == postac.koordynat_x and obj.koordynat_y == postac.koordynat_y-1 and obj.mozna_budowac == True:
-                #                 mapa[obj.id] = Bridge(obj.koordynat_x,obj.koordynat_y,obj.id)
-                #                 i = False
-                #                 o +=1
-                #                 movementpoints-=1  
-                #                 break
+                if wsad == "ae":
+                        for obj in mapa:
+                            if obj.koordynat_x == postac.koordynat_x-1 and obj.koordynat_y == postac.koordynat_y and obj.interakcja == True:
+                                interakcja(obj.koordynat_x,obj.koordynat_y,mapa,len(lista_postaci),lista_postaci)
+                                o +=1
+                                i = False
+                                movementpoints-=1  
+                                break
+                if wsad == "de":
+                        for obj in mapa:
+                            if obj.koordynat_x == postac.koordynat_x+1 and obj.koordynat_y == postac.koordynat_y and obj.interakcja == True:
+                                interakcja(obj.koordynat_x,obj.koordynat_y,mapa,len(lista_postaci),lista_postaci)
+                                i = False
+                                o +=1
+                                movementpoints-=1  
+                                break  
+                if wsad == "se":
+                        for obj in mapa:
+                            if obj.koordynat_x == postac.koordynat_x and obj.koordynat_y == postac.koordynat_y+1 and obj.interakcja == True:
+                                interakcja(obj.koordynat_x,obj.koordynat_y,mapa,len(lista_postaci),lista_postaci)
+                                i = False
+                                o +=1
+                                movementpoints-=1  
+                                break
+                if wsad == "we":
+                        for obj in mapa:
+                            if obj.koordynat_x == postac.koordynat_x and obj.koordynat_y == postac.koordynat_y-1 and obj.interakcja == True:
+                                interakcja(obj.koordynat_x,obj.koordynat_y,mapa,len(lista_postaci),lista_postaci)
+                                i = False
+                                o +=1
+                                movementpoints-=1  
+                                break
         if movementpoints < 0:
              movementpoints = 0
 
-        print(postac.koordynat_x,postac.koordynat_y,"day - ",day_counter,"action points left - ",movementpoints)
+        print(f"koordynaty - ({postac.koordynat_x,postac.koordynat_y})",f"day - {day_counter}",f"action points left - {movementpoints}")
         if day_counter>=1 and day_counter%2==0:
             print("night")
         else:
             print("day")
         generacjamapy(mapa,lista_postaci)
+# ================================================================================
+# ================================================================================
+print("mozesz sie poruszac uzywajac wasd")
+print(30*"-")
+print("w - do gory")
+print("s - do dolu")
+print("a - w lewo")
+print("d - w prawo")
+print(30*"-")
+print("zeby budowac rzeczy, po napisaniu w ktora strone chcesz zbudowac napisz b (xb gdzie x to w,s,a lub d) ")
+print("specyficzne rzeczy mozesz budowac tylko na specyficznym terenie")
+print("mozesz rowniez uzywac/interaktowac z specyficznymi rzeczami(teraz tylko miasto) uzywajac podobnego sposobu jak z budowaniem tylko zamiast b uzywajac e")
+print(30*"-")
+print("(na mapie) A - gora, _ - polana, F - las, H - most, D - drwal, Z - kopalnia zlota, K - kopalnia kamienia, M - miasto, O - twoja postac")
+print("(pozniej zrobie rzeczy z dniami i zasobami ale teraz sa bezuzyteczne)")
+print("kazda postac ma 10 punktow akcji, przechodzenie przez normalny teren kosztuje 1 tak samo jak budowanie i interakcje, a przechodzenie przez trudny teren kosztuje 2")
+print(30*"-")
+input("zeby kontunuowac nacisnij enter  ")
+print(30*"-")
 
 
+gen_postaci(mapa,n,lista_postaci)
+generacjamapy(mapa,lista_postaci)
 
 while True:
-        print("\033[1;37;40m postac 1")
+        n=0
+        for i in lista_postaci:
 
-        system_ruchu(day_counter,lista_postaci[0],lista_postaci,mapa,addmove)
-        print("\033[1;37;40m postac 2")
+            print(f"\033[1;37;40m postac {n+1}")
 
-        system_ruchu(day_counter,lista_postaci[1],lista_postaci,mapa,addmove)
-        print("\033[1;37;40m postac 3")
-
-        system_ruchu(day_counter,lista_postaci[2],lista_postaci,mapa,addmove)
+            system_ruchu(day_counter,lista_postaci[n],lista_postaci,mapa,addmove)
+            n+=1
